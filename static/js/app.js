@@ -846,3 +846,13 @@ function filterTable(inputId, bodyId) {
   const q = document.getElementById(inputId).value.toLowerCase();
   document.querySelectorAll(`#${bodyId} tr`).forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
 }
+
+// ── Sidebar credit: slide up when cursor nears bottom-left corner ─────────────
+document.addEventListener('mousemove', (e) => {
+  const credit = document.querySelector('.sidebar-credit');
+  const sidebar = document.getElementById('sidebar');
+  if (!credit || !sidebar) return;
+  const sidebarW = sidebar.offsetWidth;
+  const inZone = e.clientX < sidebarW && e.clientY > window.innerHeight - 90;
+  credit.classList.toggle('visible', inZone);
+});
