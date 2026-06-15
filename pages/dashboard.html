@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoboInventory — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- Mobile sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon-wrapper"><span class="logo-icon-sm">🤖</span></div>
+    <div>
+      <div class="logo-text">RoboInventory</div>
+      <div class="logo-version">v2.0 PHP</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <!-- Built dynamically by buildSidebar() in app.js based on user role -->
+  </nav>
+  <div class="sidebar-credit">
+    <span class="credit-label">Built by</span>
+    <span class="credit-name">Abashesh Ranabhat</span>
+    <a class="credit-link" href="https://github.com/Alpha107" target="_blank" rel="noopener">github.com/Alpha107</a>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+  <header class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-right">
+      <div class="user-badge"><div class="user-avatar" id="userAvatarInitial">A</div><span id="usernameDisplay">admin</span></div>
+    </div>
+  </header>
+  <div class="page-container" id="pageContainer">
+    <!-- Pages injected by JS -->
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+  <div class="modal-box" id="modalBox" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="/static/js/app.js"></script>
+<script src="/static/js/pages.js"></script>
+<script src="/static/js/requests.js"></script>
+</body>
+</html>

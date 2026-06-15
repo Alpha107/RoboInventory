@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoboInventory — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-dark:  #0f2218;
+      --green-mid:   #1a6b3a;
+      --green-acc:   #15803d;
+      --green-light: #4ade80;
+      --bg:          #f0f4f1;
+      --surface:     #ffffff;
+      --border:      #d8e6dd;
+      --text:        #0e1a12;
+      --muted:       #5f7568;
+      --danger:      #dc2626;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── Left brand panel ── */
+    .brand-panel {
+      width: 46%;
+      background: linear-gradient(160deg, #0f2218 0%, #0c1c13 55%, #081510 100%);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 64px 56px;
+      position: relative; overflow: hidden;
+    }
+    /* top accent bar */
+    .brand-panel::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #1a6b3a, #4ade80, #1a6b3a);
+    }
+    /* ambient glow */
+    .brand-panel::after {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse at 15% 40%, rgba(74,222,128,0.1) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, rgba(26,107,58,0.08) 0%, transparent 50%);
+    }
+    /* dot grid overlay */
+    .brand-dots {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle, rgba(74,222,128,0.07) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    .brand-logo {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 56px; position: relative; z-index: 1;
+    }
+    .brand-logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(26,107,58,0.3));
+      border: 1px solid rgba(74,222,128,0.35);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 16px rgba(74,222,128,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .brand-logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px; font-weight: 700; color: #fff;
+    }
+    .brand-tagline {
+      font-size: 12px; color: rgba(74,222,128,0.6);
+      margin-top: 3px; font-weight: 500; letter-spacing: 0.3px;
+    }
+    .brand-headline {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 36px; font-weight: 700;
+      color: #ffffff; line-height: 1.2;
+      margin-bottom: 18px; position: relative; z-index: 1;
+      letter-spacing: -0.5px;
+    }
+    .brand-headline span {
+      background: linear-gradient(135deg, #4ade80, #86efac);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .brand-desc {
+      font-size: 14px; color: rgba(255,255,255,0.45);
+      line-height: 1.8; max-width: 360px;
+      position: relative; z-index: 1;
+    }
+    .brand-features {
+      margin-top: 40px; list-style: none;
+      position: relative; z-index: 1; width: 100%;
+    }
+    .brand-features li {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .brand-features li:last-child { border-bottom: none; }
+    .brand-features .check {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(74,222,128,0.15);
+      border: 1px solid rgba(74,222,128,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--green-light); flex-shrink: 0;
+    }
+    .brand-footer {
+      margin-top: auto; padding-top: 48px;
+      font-size: 12px; color: rgba(255,255,255,0.2);
+      position: relative; z-index: 1;
+    }
+
+    /* ── Right form panel ── */
+    .form-panel {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 48px 40px;
+      background: var(--surface);
+      position: relative;
+    }
+    /* subtle dot grid on right */
+    .form-panel::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(circle, rgba(26,107,58,0.04) 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    .form-inner { width: 100%; max-width: 390px; position: relative; z-index: 1; }
+
+    .form-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px; font-weight: 700;
+      color: var(--text); margin-bottom: 6px; letter-spacing: -0.3px;
+    }
+    .form-sub {
+      font-size: 14px; color: var(--muted);
+      margin-bottom: 32px; line-height: 1.5;
+    }
+
+    /* ── Role toggle ── */
+    .role-tabs {
+      display: flex;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 11px; padding: 4px; gap: 4px;
+      margin-bottom: 28px;
+    }
+    .role-tab {
+      flex: 1; padding: 10px 0;
+      border: none; border-radius: 8px;
+      background: transparent; color: var(--muted);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.22s ease;
+    }
+    .role-tab:hover:not(.active) { color: var(--text); background: rgba(0,0,0,0.04); }
+    .role-tab.active {
+      background: linear-gradient(135deg, #0f2218, #1a4a2a);
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(15,34,24,0.3);
+    }
+
+    /* ── Fields ── */
+    .field-group { margin-bottom: 18px; }
+    .field-label {
+      display: block; font-size: 11.5px; font-weight: 700;
+      color: var(--muted); margin-bottom: 7px;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 15px; pointer-events: none;
+    }
+    .field-input {
+      width: 100%; padding: 12px 14px 12px 42px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 14px;
+      font-family: 'Inter', sans-serif; outline: none;
+      transition: all 0.2s ease;
+    }
+    .field-input:focus {
+      border-color: var(--green-mid);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(26,107,58,0.12);
+    }
+
+    /* ── Submit ── */
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #1a6b3a, #15803d);
+      color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; margin-top: 8px;
+      transition: all 0.22s ease;
+      box-shadow: 0 3px 12px rgba(26,107,58,0.3);
+      letter-spacing: 0.1px;
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #155e32, #166534);
+      box-shadow: 0 6px 22px rgba(26,107,58,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(26,107,58,0.3); }
+    .btn-submit.loading { opacity: 0.7; pointer-events: none; }
+
+    /* ── Error ── */
+    .err-msg {
+      background: #fff1f1; border: 1px solid #fecaca;
+      color: #b91c1c; border-radius: 9px;
+      padding: 12px 16px; font-size: 13px;
+      margin-top: 16px; display: none; line-height: 1.5;
+    }
+    .err-msg.show { display: block; animation: shake 0.35s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+
+    .form-footer {
+      text-align: center; margin-top: 24px;
+      font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .brand-panel { display: none; }
+      .form-panel { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Left brand panel -->
+  <div class="brand-panel">
+    <div class="brand-dots"></div>
+    <div class="brand-logo">
+      <div class="brand-logo-icon">🤖</div>
+      <div>
+        <div class="brand-logo-text">RoboInventory</div>
+        <div class="brand-tagline">Office Robotics Management</div>
+      </div>
+    </div>
+    <h1 class="brand-headline">Manage your<br>inventory <span>smarter.</span></h1>
+    <p class="brand-desc">
+      A centralised system for tracking robotics components, projects, team requests, and stock levels — all in one place.
+    </p>
+    <ul class="brand-features">
+      <li><span class="check">✓</span> Real-time component inventory &amp; reorder alerts</li>
+      <li><span class="check">✓</span> Component request workflow for team members</li>
+      <li><span class="check">✓</span> Full audit trail and activity log</li>
+      <li><span class="check">✓</span> Project &amp; purchase tracking</li>
+    </ul>
+    <div class="brand-footer">
+      Developed by <strong style="color:rgba(255,255,255,0.5)">Abashesh Ranabhat</strong>
+    </div>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="form-panel">
+    <div class="form-inner">
+      <h2 class="form-title">Welcome back</h2>
+      <p class="form-sub" id="formSub">Sign in to your administrator account to continue.</p>
+
+      <!-- Role tabs -->
+      <div class="role-tabs">
+        <button type="button" class="role-tab active" id="tabAdmin" onclick="selectRole('admin')">
+          👑 Admin
+        </button>
+        <button type="button" class="role-tab" id="tabUser" onclick="selectRole('user')">
+          👤 User
+        </button>
+      </div>
+
+      <form id="loginForm">
+        <div class="field-group">
+          <label class="field-label">Username</label>
+          <div class="field-wrap">
+            <span class="field-icon">👤</span>
+            <input type="text" class="field-input" id="username"
+              placeholder="Enter username" autocomplete="username" required>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="field-wrap">
+            <span class="field-icon">🔒</span>
+            <input type="password" class="field-input" id="password"
+              placeholder="Enter password" autocomplete="current-password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="loginBtn">
+          👑 Sign In as Admin
+        </button>
+        <div class="err-msg" id="errorMsg"></div>
+      </form>
+
+      <div class="form-footer" id="formHint">
+        Admin accounts have full access to all inventory features.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedRole = 'admin';
+
+    const roleConfig = {
+      admin: {
+        btnText: '👑 Sign In as Admin',
+        sub:     'Sign in to your administrator account to continue.',
+        hint:    'Admin accounts have full access to all inventory features.',
+      },
+      user: {
+        btnText: '👤 Sign In as User',
+        sub:     'Sign in to view inventory and submit component requests.',
+        hint:    'User accounts can browse inventory and request components.',
+      },
+    };
+
+    function selectRole(role) {
+      selectedRole = role;
+      const cfg = roleConfig[role];
+      document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+      document.getElementById('tabUser').classList.toggle('active',  role === 'user');
+      document.getElementById('loginBtn').textContent = cfg.btnText;
+      document.getElementById('formSub').textContent  = cfg.sub;
+      document.getElementById('formHint').textContent = cfg.hint;
+      document.getElementById('errorMsg').classList.remove('show');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('errorMsg');
+      const cfg = roleConfig[selectedRole];
+
+      btn.textContent = 'Signing in…';
+      btn.classList.add('loading');
+      err.classList.remove('show');
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.role !== selectedRole) {
+            const actual = data.role === 'admin' ? 'an Admin' : 'a User';
+            err.textContent = `This account is ${actual} account. Please select the correct role tab.`;
+            err.classList.add('show');
+            btn.textContent = cfg.btnText;
+            btn.classList.remove('loading');
+            fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            return;
+          }
+          window.location.href = '/dashboard';
+        } else {
+          const data = await res.json().catch(() => ({}));
+          err.textContent = data.error || 'Invalid username or password';
+          err.classList.add('show');
+          btn.textContent = cfg.btnText;
+          btn.classList.remove('loading');
+        }
+      } catch {
+        err.textContent = 'Connection error. Please try again.';
+        err.classList.add('show');
+        btn.textContent = cfg.btnText;
+        btn.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
