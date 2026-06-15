@@ -727,89 +727,203 @@ function clearPurchaseFilter() {
 
 async function showPurchaseModal(id) {
   const p = id ? (window._purchases || []).find(x => x.id === id) : null;
-  const [components, pricing] = await Promise.all([
-    api('/api/components'),
-    api('/api/pricing')
-  ]);
+  const [components, pricing] = await Promise.all([api('/api/components'), api('/api/pricing')]);
   if (!components || !pricing) return;
 
   const priceMap = {};
   pricing.forEach(pr => { priceMap[pr.material.toLowerCase()] = pr.retail_cost; });
   const datalistOptions = components.map(c => `<option value="${escHtml(c.name)}">`).join('');
-
-  openModal(p ? 'Edit Purchase' : 'Add Purchase Record', `
-  <datalist id="inventoryItems">${datalistOptions}</datalist>
-  <form onsubmit="savePurchase(event,${p ? p.id : 'null'})">
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Date</label>
-        <input class="form-control" id="pu_date" type="date" value="${p ? p.date : today()}"></div>
-      <div class="form-group"><label class="form-label">Supplier</label>
-        <input class="form-control" id="pu_supplier" value="${p ? escHtml(p.supplier||'') : ''}" placeholder="Supplier name"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Item Name *
-        <span style="font-size:11px;color:var(--accent);margin-left:6px;font-weight:400;text-transform:none">✨ Type to search inventory</span>
-      </label>
-      <input class="form-control" id="pu_item" list="inventoryItems" value="${p ? escHtml(p.item) : ''}"
-        required placeholder="Start typing to search inventory items..." autocomplete="off"
-        oninput="onPurchaseItemInput(this.value)">
-      <div id="pu_item_hint" style="font-size:12px;color:var(--muted);margin-top:5px"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Quantity</label>
-        <input class="form-control" id="pu_qty" type="number" min="1" value="${p ? p.quantity : 1}" oninput="updatePurchaseTotal()"></div>
-      <div class="form-group"><label class="form-label">Unit Price (NPR)</label>
-        <input class="form-control" id="pu_price" type="number" min="0" step="0.01" value="${p ? p.unit_price : 0}" oninput="updatePurchaseTotal()"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Total Amount</label>
-      <div id="pu_total_display" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--accent3)">
-        रु ${p ? (p.total||0).toLocaleString() : '0'}
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Invoice No.</label>
-        <input class="form-control" id="pu_invoice" value="${p ? escHtml(p.invoice_no||'') : ''}" placeholder="Optional"></div>
-      <div class="form-group"><label class="form-label">Notes</label>
-        <input class="form-control" id="pu_notes" value="${p ? escHtml(p.notes||'') : ''}" placeholder="Optional"></div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button type="submit" class="btn btn-primary" id="puSaveBtn">${p ? 'Update' : 'Add'} Purchase</button>
-    </div>
-  </form>`);
-
   window._purchasePriceMap = priceMap;
   window._purchaseComponents = components;
-  if (p) onPurchaseItemInput(p.item);
-  updatePurchaseTotal();
+  window._puRowIdx = 0;
+
+  if (p) {
+    // ── Edit: single-row form ──────────────────────────────────────────────
+    openModal('Edit Purchase', `
+    <datalist id="inventoryItems">${datalistOptions}</datalist>
+    <form onsubmit="savePurchase(event,${p.id})">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date</label>
+          <input class="form-control" id="pu_date" type="date" value="${p.date}"></div>
+        <div class="form-group"><label class="form-label">Supplier</label>
+          <input class="form-control" id="pu_supplier" value="${escHtml(p.supplier||'')}" placeholder="Supplier name"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Item Name *</label>
+        <input class="form-control" id="pu_item" list="inventoryItems" value="${escHtml(p.item)}"
+          required placeholder="Type or select component…" autocomplete="off"
+          oninput="onPurchaseItemInput(this.value)">
+        <div id="pu_item_hint" style="font-size:12px;color:var(--muted);margin-top:5px"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Quantity</label>
+          <input class="form-control" id="pu_qty" type="number" min="1" value="${p.quantity}" oninput="updatePurchaseTotal()"></div>
+        <div class="form-group"><label class="form-label">Unit Price (NPR)</label>
+          <input class="form-control" id="pu_price" type="number" min="0" step="0.01" value="${p.unit_price}" oninput="updatePurchaseTotal()"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Total Amount</label>
+        <div id="pu_total_display" style="background:var(--accent-lt);border:1px solid rgba(30,45,125,0.15);border-radius:10px;padding:10px 14px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--accent)">
+          रु ${(p.total||0).toLocaleString()}
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Invoice No.</label>
+          <input class="form-control" id="pu_invoice" value="${escHtml(p.invoice_no||'')}" placeholder="Optional"></div>
+        <div class="form-group"><label class="form-label">Notes</label>
+          <input class="form-control" id="pu_notes" value="${escHtml(p.notes||'')}" placeholder="Optional"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="puSaveBtn">Update Purchase</button>
+      </div>
+    </form>`);
+    onPurchaseItemInput(p.item);
+    updatePurchaseTotal();
+
+  } else {
+    // ── Add: multi-row bill form ───────────────────────────────────────────
+    openModal('Add Purchase Record', `
+    <datalist id="inventoryItems">${datalistOptions}</datalist>
+    <form onsubmit="savePurchase(event,null)">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date</label>
+          <input class="form-control" id="pu_date" type="date" value="${today()}"></div>
+        <div class="form-group"><label class="form-label">Supplier</label>
+          <input class="form-control" id="pu_supplier" placeholder="Supplier name"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" style="margin-bottom:10px">
+          Items *
+          <span style="font-size:11px;color:var(--muted);margin-left:8px;font-weight:400;text-transform:none">Select existing or type new component name</span>
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 80px 110px 90px 34px;gap:8px;padding:0 2px 8px;border-bottom:1px solid var(--border);margin-bottom:8px">
+          <span style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.9px">Component</span>
+          <span style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.9px">Qty</span>
+          <span style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.9px">Unit Price</span>
+          <span style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.9px">Subtotal</span>
+          <span></span>
+        </div>
+        <div id="pu_rows"></div>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px" onclick="addPurchaseRow()">+ Add Item</button>
+      </div>
+
+      <div style="background:var(--accent-lt);border:1px solid rgba(30,45,125,0.15);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.9px">Grand Total</span>
+        <span id="pu_grand_total" style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--accent)">रु 0</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Invoice No.</label>
+          <input class="form-control" id="pu_invoice" placeholder="Optional"></div>
+        <div class="form-group"><label class="form-label">Notes</label>
+          <input class="form-control" id="pu_notes" placeholder="Optional"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="puSaveBtn">Add Purchase</button>
+      </div>
+    </form>`, true);
+
+    addPurchaseRow();
+  }
+}
+
+function addPurchaseRow() {
+  const idx = window._puRowIdx++;
+  const container = document.getElementById('pu_rows');
+  const row = document.createElement('div');
+  row.className = 'pu-item-row';
+  row.dataset.idx = idx;
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 110px 90px 34px;gap:8px;align-items:start;margin-bottom:10px';
+  row.innerHTML = `
+    <div>
+      <input class="form-control" id="pu_item_${idx}" list="inventoryItems"
+        required placeholder="Type or select…" autocomplete="off"
+        oninput="onPurchaseRowInput(${idx})">
+      <div id="pu_hint_${idx}" style="font-size:11px;margin-top:3px;min-height:15px"></div>
+    </div>
+    <input class="form-control" id="pu_qty_${idx}" type="number" min="1" value="1"
+      oninput="updatePurchaseRowTotal(${idx})">
+    <input class="form-control" id="pu_price_${idx}" type="number" min="0" step="0.01" value="0"
+      oninput="updatePurchaseRowTotal(${idx})">
+    <div id="pu_sub_${idx}" style="padding:10px 6px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--text)">रु 0</div>
+    <button type="button" onclick="removePurchaseRow(${idx})"
+      style="background:none;border:1px solid var(--border);border-radius:7px;width:32px;height:40px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
+      title="Remove">×</button>`;
+  container.appendChild(row);
+}
+
+function removePurchaseRow(idx) {
+  const container = document.getElementById('pu_rows');
+  if (!container || container.children.length <= 1) return;
+  document.querySelector(`.pu-item-row[data-idx="${idx}"]`)?.remove();
+  updatePurchaseGrandTotal();
+}
+
+function onPurchaseRowInput(idx) {
+  const val = document.getElementById(`pu_item_${idx}`)?.value || '';
+  const hint = document.getElementById(`pu_hint_${idx}`);
+  if (!hint) return;
+  const match = (window._purchaseComponents || []).find(c => c.name.toLowerCase() === val.toLowerCase());
+  if (match) {
+    const avail = match.available ?? (match.total_purchased - match.used - match.taken_for_use - (match.faulty||0) - (match.sold||0));
+    hint.innerHTML = `<span style="color:var(--success)">✓ In inventory</span> — Avail: <strong style="color:${avail < 5 ? 'var(--danger)' : 'var(--success)'}">${avail}</strong>`;
+    const pf = document.getElementById(`pu_price_${idx}`);
+    if (pf && +pf.value === 0) {
+      const known = (window._purchasePriceMap || {})[val.toLowerCase()];
+      if (known) { pf.value = known; updatePurchaseRowTotal(idx); }
+    }
+  } else if (val.trim()) {
+    hint.innerHTML = `<span style="color:var(--warning)">⚠ New — will be added to inventory</span>`;
+  } else {
+    hint.innerHTML = '';
+  }
+}
+
+function updatePurchaseRowTotal(idx) {
+  const qty   = parseFloat(document.getElementById(`pu_qty_${idx}`)?.value)   || 0;
+  const price = parseFloat(document.getElementById(`pu_price_${idx}`)?.value) || 0;
+  const sub   = document.getElementById(`pu_sub_${idx}`);
+  if (sub) sub.textContent = 'रु ' + (qty * price).toLocaleString('en-IN');
+  updatePurchaseGrandTotal();
+}
+
+function updatePurchaseGrandTotal() {
+  let total = 0;
+  document.querySelectorAll('.pu-item-row').forEach(row => {
+    const i = row.dataset.idx;
+    total += (parseFloat(document.getElementById(`pu_qty_${i}`)?.value)||0)
+           * (parseFloat(document.getElementById(`pu_price_${i}`)?.value)||0);
+  });
+  const el = document.getElementById('pu_grand_total');
+  if (el) el.textContent = 'रु ' + total.toLocaleString('en-IN');
 }
 
 function onPurchaseItemInput(val) {
   const hint = document.getElementById('pu_item_hint');
   if (!hint) return;
-  const comps = window._purchaseComponents || [];
-  const match = comps.find(c => c.name.toLowerCase() === val.toLowerCase());
+  const match = (window._purchaseComponents || []).find(c => c.name.toLowerCase() === val.toLowerCase());
   if (match) {
     const avail = match.available ?? (match.total_purchased - match.used - match.taken_for_use);
-    hint.innerHTML = `<span style="color:var(--accent3)">✅ Found in inventory</span> —
-      Total: <strong>${match.total_purchased}</strong> &nbsp;|
-      Used: <strong>${match.used}</strong> &nbsp;|
-      Available: <strong style="color:${avail < 5 ? 'var(--danger)' : 'var(--accent3)'}">${avail}</strong>`;
-    const priceField = document.getElementById('pu_price');
-    if (priceField && (+priceField.value === 0)) {
+    hint.innerHTML = `<span style="color:var(--success)">✓ Found in inventory</span> —
+      Total: <strong>${match.total_purchased}</strong> | Used: <strong>${match.used}</strong> |
+      Available: <strong style="color:${avail < 5 ? 'var(--danger)' : 'var(--success)'}">${avail}</strong>`;
+    const pf = document.getElementById('pu_price');
+    if (pf && +pf.value === 0) {
       const known = (window._purchasePriceMap || {})[val.toLowerCase()];
-      if (known) { priceField.value = known; updatePurchaseTotal(); }
+      if (known) { pf.value = known; updatePurchaseTotal(); }
     }
   } else if (val.trim()) {
-    hint.innerHTML = `<span style="color:var(--warning)">⚠️ Not in inventory — will be created as new component on save.</span>`;
+    hint.innerHTML = `<span style="color:var(--warning)">⚠ Not in inventory — will be created on save</span>`;
   } else {
     hint.innerHTML = '';
   }
 }
 
 function updatePurchaseTotal() {
-  const qty = parseFloat(document.getElementById('pu_qty')?.value) || 0;
+  const qty   = parseFloat(document.getElementById('pu_qty')?.value)   || 0;
   const price = parseFloat(document.getElementById('pu_price')?.value) || 0;
   const el = document.getElementById('pu_total_display');
   if (el) el.textContent = 'रु ' + (qty * price).toLocaleString('en-IN');
@@ -819,19 +933,48 @@ async function savePurchase(e, id) {
   e.preventDefault();
   const btn = document.getElementById('puSaveBtn');
   setLoading(btn, true);
-  const body = {
-    date:       document.getElementById('pu_date').value,
-    supplier:   document.getElementById('pu_supplier').value,
-    item:       document.getElementById('pu_item').value,
-    quantity:  +document.getElementById('pu_qty').value,
-    unit_price:+document.getElementById('pu_price').value,
-    invoice_no: document.getElementById('pu_invoice').value,
-    notes:      document.getElementById('pu_notes').value
-  };
-  const r = await api(id ? `/api/purchases/${id}` : '/api/purchases', id ? 'PUT' : 'POST', body);
-  setLoading(btn, false, id ? 'Update Purchase' : 'Add Purchase');
-  if (!r) return;
-  closeModal(); toast('Saved!'); pages.purchases();
+
+  if (id) {
+    const body = {
+      date:       document.getElementById('pu_date').value,
+      supplier:   document.getElementById('pu_supplier').value,
+      item:       document.getElementById('pu_item').value,
+      quantity:  +document.getElementById('pu_qty').value,
+      unit_price:+document.getElementById('pu_price').value,
+      invoice_no: document.getElementById('pu_invoice').value,
+      notes:      document.getElementById('pu_notes').value
+    };
+    const r = await api(`/api/purchases/${id}`, 'PUT', body);
+    setLoading(btn, false, 'Update Purchase');
+    if (!r) return;
+    closeModal(); toast('Updated!'); pages.purchases();
+  } else {
+    const date       = document.getElementById('pu_date').value;
+    const supplier   = document.getElementById('pu_supplier').value;
+    const invoice_no = document.getElementById('pu_invoice').value;
+    const notes      = document.getElementById('pu_notes').value;
+
+    const payloads = [];
+    document.querySelectorAll('.pu-item-row').forEach(row => {
+      const i    = row.dataset.idx;
+      const item = (document.getElementById(`pu_item_${i}`)?.value || '').trim();
+      if (!item) return;
+      payloads.push({
+        date, supplier, invoice_no, notes, item,
+        quantity:   +document.getElementById(`pu_qty_${i}`).value   || 1,
+        unit_price: +document.getElementById(`pu_price_${i}`).value || 0,
+      });
+    });
+
+    if (!payloads.length) { setLoading(btn, false, 'Add Purchase'); return; }
+    const results = await Promise.all(payloads.map(b => api('/api/purchases', 'POST', b)));
+    const count = payloads.length;
+    setLoading(btn, false, 'Add Purchase');
+    if (results.some(r => !r)) return;
+    closeModal();
+    toast(count === 1 ? 'Purchase saved!' : `${count} items saved!`);
+    pages.purchases();
+  }
 }
 
 async function deletePurchase(id) {
