@@ -5,20 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RoboInventory — Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --green-dark:  #0f2218;
-      --green-mid:   #1a6b3a;
-      --green-acc:   #15803d;
-      --green-light: #4ade80;
-      --bg:          #f0f4f1;
-      --surface:     #ffffff;
-      --border:      #d8e6dd;
-      --text:        #0e1a12;
-      --muted:       #5f7568;
-      --danger:      #dc2626;
+      --bg:       #edf0f9;
+      --surface:  #ffffff;
+      --border:   #e1e6f0;
+      --accent:   #1e2d7d;
+      --accent2:  #2a3ea0;
+      --accent-lt:#eef0fb;
+      --accent-md:#6675d4;
+      --text:     #0f1740;
+      --text2:    #2d3a6b;
+      --muted:    #5a6488;
+      --muted2:   #8892b4;
+      --danger:   #dc2626;
+      --warning:  #d97706;
     }
 
     body {
@@ -27,126 +30,59 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
     }
 
-    /* ── Left brand panel ── */
-    .brand-panel {
-      width: 46%;
-      background: linear-gradient(160deg, #0f2218 0%, #0c1c13 55%, #081510 100%);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: flex-start;
-      padding: 64px 56px;
-      position: relative; overflow: hidden;
-    }
-    /* top accent bar */
-    .brand-panel::before {
+    /* dot-grid background */
+    body::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, #1a6b3a, #4ade80, #1a6b3a);
-    }
-    /* ambient glow */
-    .brand-panel::after {
-      content: '';
-      position: absolute; inset: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse at 15% 40%, rgba(74,222,128,0.1) 0%, transparent 55%),
-        radial-gradient(ellipse at 85% 80%, rgba(26,107,58,0.08) 0%, transparent 50%);
-    }
-    /* dot grid overlay */
-    .brand-dots {
-      position: absolute; inset: 0; pointer-events: none; z-index: 0;
-      background-image: radial-gradient(circle, rgba(74,222,128,0.07) 1px, transparent 1px);
-      background-size: 22px 22px;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: radial-gradient(circle, rgba(30,45,125,0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
 
-    .brand-logo {
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 56px; position: relative; z-index: 1;
-    }
-    .brand-logo-icon {
-      width: 52px; height: 52px;
-      background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(26,107,58,0.3));
-      border: 1px solid rgba(74,222,128,0.35);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 4px 16px rgba(74,222,128,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-    .brand-logo-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 20px; font-weight: 700; color: #fff;
-    }
-    .brand-tagline {
-      font-size: 12px; color: rgba(74,222,128,0.6);
-      margin-top: 3px; font-weight: 500; letter-spacing: 0.3px;
-    }
-    .brand-headline {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 36px; font-weight: 700;
-      color: #ffffff; line-height: 1.2;
-      margin-bottom: 18px; position: relative; z-index: 1;
-      letter-spacing: -0.5px;
-    }
-    .brand-headline span {
-      background: linear-gradient(135deg, #4ade80, #86efac);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .brand-desc {
-      font-size: 14px; color: rgba(255,255,255,0.45);
-      line-height: 1.8; max-width: 360px;
-      position: relative; z-index: 1;
-    }
-    .brand-features {
-      margin-top: 40px; list-style: none;
-      position: relative; z-index: 1; width: 100%;
-    }
-    .brand-features li {
-      display: flex; align-items: center; gap: 12px;
-      font-size: 13px; color: rgba(255,255,255,0.5);
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .brand-features li:last-child { border-bottom: none; }
-    .brand-features .check {
-      width: 20px; height: 20px; border-radius: 50%;
-      background: rgba(74,222,128,0.15);
-      border: 1px solid rgba(74,222,128,0.4);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 10px; color: var(--green-light); flex-shrink: 0;
-    }
-    .brand-footer {
-      margin-top: auto; padding-top: 48px;
-      font-size: 12px; color: rgba(255,255,255,0.2);
-      position: relative; z-index: 1;
-    }
-
-    /* ── Right form panel ── */
-    .form-panel {
-      flex: 1;
-      display: flex; align-items: center; justify-content: center;
-      padding: 48px 40px;
+    /* ── Main card ── */
+    .login-card {
+      width: 100%; max-width: 900px;
       background: var(--surface);
-      position: relative;
-    }
-    /* subtle dot grid on right */
-    .form-panel::before {
-      content: '';
-      position: absolute; inset: 0; pointer-events: none;
-      background-image: radial-gradient(circle, rgba(26,107,58,0.04) 1px, transparent 1px);
-      background-size: 22px 22px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 8px 48px rgba(30,45,125,0.1), 0 2px 12px rgba(30,45,125,0.06);
+      display: flex;
+      overflow: hidden;
+      position: relative; z-index: 1;
     }
 
-    .form-inner { width: 100%; max-width: 390px; position: relative; z-index: 1; }
+    /* ── Left: form side ── */
+    .form-side {
+      flex: 1;
+      padding: 48px 44px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .form-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 28px; font-weight: 500;
+    }
+    .form-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent-md);
+      box-shadow: 0 0 0 3px rgba(102,117,212,0.2);
+    }
+    .form-badge-sep { color: var(--border); margin: 0 2px; }
 
     .form-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 28px; font-weight: 700;
-      color: var(--text); margin-bottom: 6px; letter-spacing: -0.3px;
+      font-family: 'Lora', serif;
+      font-size: 30px; font-weight: 700;
+      color: var(--text); margin-bottom: 8px; letter-spacing: -0.2px;
     }
     .form-sub {
       font-size: 14px; color: var(--muted);
-      margin-bottom: 32px; line-height: 1.5;
+      margin-bottom: 32px; line-height: 1.6;
     }
 
     /* ── Role toggle ── */
@@ -154,7 +90,7 @@
       display: flex;
       background: var(--bg); border: 1px solid var(--border);
       border-radius: 11px; padding: 4px; gap: 4px;
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
     .role-tab {
       flex: 1; padding: 10px 0;
@@ -166,15 +102,15 @@
       display: flex; align-items: center; justify-content: center; gap: 6px;
       transition: all 0.22s ease;
     }
-    .role-tab:hover:not(.active) { color: var(--text); background: rgba(0,0,0,0.04); }
+    .role-tab:hover:not(.active) { color: var(--text); background: rgba(30,45,125,0.05); }
     .role-tab.active {
-      background: linear-gradient(135deg, #0f2218, #1a4a2a);
+      background: linear-gradient(135deg, #1e2d7d, #2a3ea0);
       color: #ffffff;
-      box-shadow: 0 3px 10px rgba(15,34,24,0.3);
+      box-shadow: 0 3px 10px rgba(30,45,125,0.28);
     }
 
     /* ── Fields ── */
-    .field-group { margin-bottom: 18px; }
+    .field-group { margin-bottom: 16px; }
     .field-label {
       display: block; font-size: 11.5px; font-weight: 700;
       color: var(--muted); margin-bottom: 7px;
@@ -183,7 +119,7 @@
     .field-wrap { position: relative; }
     .field-icon {
       position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
-      color: var(--muted); font-size: 15px; pointer-events: none;
+      color: var(--muted2); font-size: 15px; pointer-events: none;
     }
     .field-input {
       width: 100%; padding: 12px 14px 12px 42px;
@@ -192,93 +128,170 @@
       font-family: 'Inter', sans-serif; outline: none;
       transition: all 0.2s ease;
     }
+    .field-input::placeholder { color: var(--muted2); }
     .field-input:focus {
-      border-color: var(--green-mid);
+      border-color: var(--accent);
       background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(26,107,58,0.12);
+      box-shadow: 0 0 0 3px rgba(30,45,125,0.1);
     }
 
     /* ── Submit ── */
     .btn-submit {
       width: 100%; padding: 13px;
-      background: linear-gradient(135deg, #1a6b3a, #15803d);
+      background: linear-gradient(135deg, #1e2d7d, #2a3ea0);
       color: #fff;
       border: none; border-radius: 10px;
       font-family: 'Space Grotesk', sans-serif;
       font-size: 15px; font-weight: 600;
       cursor: pointer; margin-top: 8px;
       transition: all 0.22s ease;
-      box-shadow: 0 3px 12px rgba(26,107,58,0.3);
-      letter-spacing: 0.1px;
+      box-shadow: 0 3px 12px rgba(30,45,125,0.28);
+      letter-spacing: 0.2px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-submit:hover {
-      background: linear-gradient(135deg, #155e32, #166534);
-      box-shadow: 0 6px 22px rgba(26,107,58,0.4);
+      background: linear-gradient(135deg, #182469, #243590);
+      box-shadow: 0 6px 22px rgba(30,45,125,0.38);
       transform: translateY(-1px);
     }
-    .btn-submit:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(26,107,58,0.3); }
+    .btn-submit:active { transform: translateY(0); }
     .btn-submit.loading { opacity: 0.7; pointer-events: none; }
 
     /* ── Error ── */
     .err-msg {
       background: #fff1f1; border: 1px solid #fecaca;
       color: #b91c1c; border-radius: 9px;
-      padding: 12px 16px; font-size: 13px;
-      margin-top: 16px; display: none; line-height: 1.5;
+      padding: 11px 15px; font-size: 13px;
+      margin-top: 14px; display: none; line-height: 1.5;
     }
     .err-msg.show { display: block; animation: shake 0.35s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      25%      { transform: translateX(-6px); }
-      75%      { transform: translateX(6px); }
+      25%      { transform: translateX(-5px); }
+      75%      { transform: translateX(5px); }
     }
 
     .form-footer {
-      text-align: center; margin-top: 24px;
-      font-size: 12px; color: var(--muted); line-height: 1.5;
+      margin-top: 22px;
+      font-size: 12px; color: var(--muted2);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .form-footer::before, .form-footer::after {
+      content: '·'; color: var(--border);
+    }
+
+    /* ── Right: preview side ── */
+    .preview-side {
+      width: 360px; flex-shrink: 0;
+      background: linear-gradient(145deg, #f4f6fc 0%, var(--accent-lt) 100%);
+      border-left: 1px solid var(--border);
+      padding: 44px 36px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .preview-side::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: radial-gradient(circle, rgba(30,45,125,0.055) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .preview-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--accent-md);
+      margin-bottom: 6px; position: relative; z-index: 1;
+    }
+    .preview-heading {
+      font-family: 'Lora', serif;
+      font-size: 20px; font-weight: 700; color: var(--text);
+      margin-bottom: 24px; position: relative; z-index: 1;
+    }
+
+    .preview-boxes {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-bottom: 16px;
+      position: relative; z-index: 1;
+    }
+    .preview-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 14px 12px;
+      box-shadow: 0 2px 8px rgba(30,45,125,0.06);
+    }
+    .preview-box-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; margin-bottom: 10px;
+    }
+    .preview-box-icon.blue   { background: rgba(14,165,233,0.12); }
+    .preview-box-icon.purple { background: rgba(124,58,237,0.12); }
+    .preview-box-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+    }
+    .preview-box-sub { font-size: 10.5px; color: var(--muted2); line-height: 1.5; }
+
+    .preview-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(30,45,125,0.06);
+      position: relative; z-index: 1;
+    }
+    .preview-stat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .preview-stat-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .preview-stat-badge {
+      font-size: 11px; font-weight: 700; color: var(--accent);
+      background: var(--accent-lt); border-radius: 6px;
+      padding: 2px 8px;
+    }
+    .preview-bars {
+      display: flex; align-items: flex-end; gap: 5px; height: 40px;
+    }
+    .preview-bar {
+      flex: 1; border-radius: 4px 4px 0 0;
+      background: var(--accent-lt);
+    }
+    .preview-bar.active { background: var(--accent-md); }
+    .preview-caption {
+      font-size: 11px; color: var(--muted2);
+      margin-top: 14px; line-height: 1.5;
+      position: relative; z-index: 1;
+    }
+
+    /* ── Page footer ── */
+    .page-footer {
+      margin-top: 24px;
+      font-size: 12px; color: var(--muted2);
+      position: relative; z-index: 1;
     }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .brand-panel { display: none; }
-      .form-panel { padding: 40px 24px; }
+      .preview-side { display: none; }
+      .form-side { padding: 36px 28px; }
     }
   </style>
 </head>
 <body>
-  <!-- Left brand panel -->
-  <div class="brand-panel">
-    <div class="brand-dots"></div>
-    <div class="brand-logo">
-      <div class="brand-logo-icon">🤖</div>
-      <div>
-        <div class="brand-logo-text">RoboInventory</div>
-        <div class="brand-tagline">Office Robotics Management</div>
+
+  <div class="login-card">
+
+    <!-- Left: form -->
+    <div class="form-side">
+      <div class="form-badge">
+        <span class="form-badge-dot"></span>
+        RoboInventory
+        <span class="form-badge-sep">·</span>
+        Internal Tool
       </div>
-    </div>
-    <h1 class="brand-headline">Manage your<br>inventory <span>smarter.</span></h1>
-    <p class="brand-desc">
-      A centralised system for tracking robotics components, projects, team requests, and stock levels — all in one place.
-    </p>
-    <ul class="brand-features">
-      <li><span class="check">✓</span> Real-time component inventory &amp; reorder alerts</li>
-      <li><span class="check">✓</span> Component request workflow for team members</li>
-      <li><span class="check">✓</span> Full audit trail and activity log</li>
-      <li><span class="check">✓</span> Project &amp; purchase tracking</li>
-    </ul>
-    <div class="brand-footer">
-      Developed by <strong style="color:rgba(255,255,255,0.5)">Abashesh Ranabhat</strong>
-    </div>
-  </div>
 
-  <!-- Right form panel -->
-  <div class="form-panel">
-    <div class="form-inner">
-      <h2 class="form-title">Welcome back</h2>
-      <p class="form-sub" id="formSub">Sign in to your administrator account to continue.</p>
+      <h1 class="form-title">Welcome back</h1>
+      <p class="form-sub" id="formSub">Sign in to manage inventory, components and projects.</p>
 
-      <!-- Role tabs -->
       <div class="role-tabs">
         <button type="button" class="role-tab active" id="tabAdmin" onclick="selectRole('admin')">
           👑 Admin
@@ -294,7 +307,7 @@
           <div class="field-wrap">
             <span class="field-icon">👤</span>
             <input type="text" class="field-input" id="username"
-              placeholder="Enter username" autocomplete="username" required>
+              placeholder="Your username" autocomplete="username" required>
           </div>
         </div>
         <div class="field-group">
@@ -302,45 +315,82 @@
           <div class="field-wrap">
             <span class="field-icon">🔒</span>
             <input type="password" class="field-input" id="password"
-              placeholder="Enter password" autocomplete="current-password" required>
+              placeholder="••••••••" autocomplete="current-password" required>
           </div>
         </div>
         <button type="submit" class="btn-submit" id="loginBtn">
-          👑 Sign In as Admin
+          Sign in →
         </button>
         <div class="err-msg" id="errorMsg"></div>
       </form>
 
       <div class="form-footer" id="formHint">
-        Admin accounts have full access to all inventory features.
+        Protected access &nbsp;·&nbsp; Authorized staff only
       </div>
     </div>
+
+    <!-- Right: preview -->
+    <div class="preview-side">
+      <div class="preview-label">RoboInventory</div>
+      <div class="preview-heading">Inventory Management</div>
+
+      <div class="preview-boxes">
+        <div class="preview-box">
+          <div class="preview-box-icon blue">🔩</div>
+          <div class="preview-box-title">Components</div>
+          <div class="preview-box-sub">Track · Reorder · Export</div>
+        </div>
+        <div class="preview-box">
+          <div class="preview-box-icon purple">📦</div>
+          <div class="preview-box-title">Projects</div>
+          <div class="preview-box-sub">Manage · Request · Log</div>
+        </div>
+      </div>
+
+      <div class="preview-stat">
+        <div class="preview-stat-header">
+          <span class="preview-stat-label">Stock levels · This week</span>
+          <span class="preview-stat-badge">Live</span>
+        </div>
+        <div class="preview-bars">
+          <div class="preview-bar" style="height:55%"></div>
+          <div class="preview-bar" style="height:70%"></div>
+          <div class="preview-bar" style="height:60%"></div>
+          <div class="preview-bar" style="height:80%"></div>
+          <div class="preview-bar" style="height:65%"></div>
+          <div class="preview-bar active" style="height:90%"></div>
+          <div class="preview-bar active" style="height:85%"></div>
+        </div>
+      </div>
+
+      <div class="preview-caption">
+        Track components, purchases and project usage all in one place.
+      </div>
+    </div>
+
   </div>
+
+  <div class="page-footer">© 2026 RoboInventory — Developed by Abashesh Ranabhat</div>
 
   <script>
     let selectedRole = 'admin';
 
     const roleConfig = {
       admin: {
-        btnText: '👑 Sign In as Admin',
-        sub:     'Sign in to your administrator account to continue.',
-        hint:    'Admin accounts have full access to all inventory features.',
+        btnText: 'Sign in →',
+        sub:     'Sign in to manage inventory, components and projects.',
       },
       user: {
-        btnText: '👤 Sign In as User',
+        btnText: 'Sign in →',
         sub:     'Sign in to view inventory and submit component requests.',
-        hint:    'User accounts can browse inventory and request components.',
       },
     };
 
     function selectRole(role) {
       selectedRole = role;
-      const cfg = roleConfig[role];
       document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
       document.getElementById('tabUser').classList.toggle('active',  role === 'user');
-      document.getElementById('loginBtn').textContent = cfg.btnText;
-      document.getElementById('formSub').textContent  = cfg.sub;
-      document.getElementById('formHint').textContent = cfg.hint;
+      document.getElementById('formSub').textContent = roleConfig[role].sub;
       document.getElementById('errorMsg').classList.remove('show');
     }
 
@@ -379,7 +429,7 @@
           window.location.href = '/dashboard';
         } else {
           const data = await res.json().catch(() => ({}));
-          err.textContent = data.error || 'Invalid username or password';
+          err.textContent = data.error || 'Invalid username or password.';
           err.classList.add('show');
           btn.textContent = cfg.btnText;
           btn.classList.remove('loading');

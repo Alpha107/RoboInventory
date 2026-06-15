@@ -852,7 +852,6 @@ document.addEventListener('mousemove', (e) => {
   const credit = document.querySelector('.sidebar-credit');
   const sidebar = document.getElementById('sidebar');
   if (!credit || !sidebar) return;
-  const sidebarW = sidebar.offsetWidth;
-  const inZone = e.clientX < sidebarW && e.clientY > window.innerHeight - 90;
+  const inZone = e.clientX > window.innerWidth - 80 && e.clientY > window.innerHeight - 40;
   credit.classList.toggle('visible', inZone);
 });
